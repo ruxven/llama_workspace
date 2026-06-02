@@ -2,7 +2,7 @@
 
 ## What is this?
 
-A custom build environment and docker image for llama.cpp
+A custom build environment and ~~docker~~podman image for llama.cpp
 
 ## How do I use it?
 
