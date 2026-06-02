@@ -24,7 +24,7 @@ services:
       - "8080:8080"
     volumes:
       - ./cache:/cache:Z
-      - ./scripts:/scripts:ro
+      - ./scripts:/scripts:Z
     environment:
       - LLAMA_ARG_HOST=0.0.0.0
       - HSA_OVERRIDE_GFX_VERSION=11.0.2
