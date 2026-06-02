@@ -1,0 +1,8 @@
+#!/bin/bash -e
+podman build \
+    -t llama-dev:latest \
+    --build-arg USER_UID=$(id -u) \
+    --build-arg USER_GID=$(id -g) \
+    -f llama-dev/Containerfile \
+   llama-dev 
+

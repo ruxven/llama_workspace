@@ -1,0 +1,41 @@
+#!/bin/bash -e
+
+cd /build/llama.cpp
+
+echo "TODO build things"
+
+cmake -B build \
+    -DGGML_NATIVE=OFF \
+    -DGGML_VULKAN=ON \
+	-DLLAMA_BUILD_TESTS=OFF \
+	-DGGML_BACKEND_DL=ON \
+	-DGGML_CPU_ALL_VARIANTS=ON
+
+cmake --build build --config Release -j$(nproc)
+
+mkdir install/usr/local/lib -p
+
+find . -name "libllama-server-impl.so*" -exec cp -fv "{}" install/usr/local/lib/.
+find . -name "libllama-common.so*" -exec cp -fv "{}" install/usr/local/lib/.
+find . -name "libmtmd.so.*" -exec cp -fv "{}" install/usr/local/lib/.
+find . -name "libllama.so.*" -exec cp -fv "{}" install/usr/local/lib/.
+find . -name "libggml.so.*" -exec cp -fv "{}" install/usr/local/lib/.
+find . -name "libggml-base.so.*" -exec cp -fv "{}" install/usr/local/lib/.
+
+DESTDIR=`readlink -f install` cmake --build build --config Release --target install
+cd install
+
+tar cvzf /build/llama-run/llama.cpp.tgz .
+
+exit 0
+RUN mkdir -p /app/lib && \
+    find build -name "*.so*" -exec cp -P {} /app/lib \;
+
+RUN mkdir -p /app/full \
+    && cp build/bin/* /app/full \
+    && cp *.py /app/full \
+    && cp -r conversion /app/full \
+    && cp -r gguf-py /app/full \
+    && cp -r requirements /app/full \
+    && cp requirements.txt /app/full \
+    && cp .devops/tools.sh /app/full/tools.sh

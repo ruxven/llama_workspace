@@ -1,0 +1,40 @@
+FROM fedora:latest
+
+# build tools
+# SSL and Vulcan SDK dependencies
+RUN dnf update -y \
+    && \
+    dnf install -y \
+        \
+        git gcc gcc-c++ \
+        make \
+        cmake \
+        wget \
+        xz \
+        \
+        openssl-devel \
+        curl \
+        libxcb \
+        libXinerama \
+        xcb-util-cursor-devel \
+        vulkan-loader-devel \
+        glslc \
+        spirv-headers-devel \
+    && \
+    dnf clean all
+
+# Match these to your host user's UID/GID.
+ARG USERNAME=llama_dev
+ARG USER_UID=1000
+ARG USER_GID=1000
+
+RUN groupadd --gid $USER_GID $USERNAME && \
+    useradd --uid $USER_UID --gid $USER_GID --shell /bin/bash --create-home $USERNAME
+
+WORKDIR /app
+
+RUN mkdir -p /app && chown $USER_UID:$USER_GID /app
+
+USER $USERNAME
+
+CMD ["bash"]

@@ -1,0 +1,7 @@
+--log-verbose
+--log-verbosity 5
+--ctx-size 128000
+--parallel 1
+--temp 1.0
+--top-p 0.95
+--top-k 64

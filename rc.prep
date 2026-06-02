@@ -1,0 +1,22 @@
+#!/bin/bash -e
+
+echo -n "Input HuggingFace Token: "
+read HF_TOKEN
+
+echo -n "Input Model: "
+read MODEL
+
+echo -n "Input LLAMA_ARGS (alternative input filepath with arguments): "
+read LLAMA_ARGS
+
+if [[ -f "$LLAMA_ARGS" ]]; then
+    echo "Loading arguments from $LLAMA_ARGS..."
+    LLAMA_ARGS=`cat $LLAMA_ARGS | xargs`
+fi
+
+{
+    echo "HF_TOKEN=$HF_TOKEN"
+    echo "MODEL=$MODEL"
+    echo "LLAMA_ARGS=$LLAMA_ARGS"
+} > .env
+

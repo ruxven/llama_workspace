@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [[ ! -d llama.cpp ]]; then
+  git clone https://github.com/ggml-org/llama.cpp
+fi
+
+RUN_CMD=$1
+IMAGE=llama-dev
+_DEFAULT_RUN_CMD=/build/scripts/build_llama
+if [[ -z "$RUN_CMD" ]]; then
+  RUN_CMD=$_DEFAULT_RUN_CMD
+fi
+podman run \
+  -it \
+  --rm \
+  --userns=keep-id \
+  -v "$(pwd):/build:Z" $IMAGE:latest "$RUN_CMD"

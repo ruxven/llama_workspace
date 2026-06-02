@@ -1,0 +1,31 @@
+FROM fedora:latest
+
+RUN dnf update -y \
+    && dnf install -y libgomp curl vulkan-loader mesa-vulkan-drivers \
+    libglvnd libGL libglvnd-glx libglvnd-egl mesa-libGLES \
+    \
+    tini \
+    && dnf autoremove -y \
+    && dnf clean all \
+    && rm -rf /tmp/* /var/tmp/*
+
+COPY llama.cpp.tgz /tmp
+RUN tar -xvzf /tmp/llama.cpp.tgz -C / && rm /tmp/llama.cpp.tgz
+
+RUN echo "/usr/local/lib64" > /etc/ld.so.conf.d/usr_local_lib64.conf && ldconfig
+
+# Match these to your host user's UID/GID.
+ARG USERNAME=llama_herder
+ARG USER_UID=1000
+ARG USER_GID=1000
+
+RUN groupadd --gid $USER_GID $USERNAME && \
+    useradd --uid $USER_UID --gid $USER_GID --shell /bin/bash --create-home $USERNAME
+
+WORKDIR /app
+
+RUN mkdir -p /app && chown $USER_UID:$USER_GID /app
+
+USER $USERNAME
+
+CMD ["bash"]
