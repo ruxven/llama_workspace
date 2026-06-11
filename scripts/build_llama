@@ -4,23 +4,51 @@ cd /build/llama.cpp
 
 echo "TODO build things"
 
+export PATH=$PATH:/usr/local/cuda/bin
+
 cmake -B build \
+    \
+    -DCMAKE_FIND_DEBUG_MODE=ON \
+    \
     -DGGML_NATIVE=OFF \
-    -DGGML_VULKAN=ON \
-	-DLLAMA_BUILD_TESTS=OFF \
-	-DGGML_BACKEND_DL=ON \
-	-DGGML_CPU_ALL_VARIANTS=ON
+    -DGGML_VULKAN=OFF \
+    -DGGML_CPU_ALL_VARIANTS=ON \
+    -DCMAKE_EXE_LINKER_FLAGS=-Wl,--allow-shlib-undefined \
+    -DLLAMA_BUILD_TESTS=OFF \
+    \
+    -DGGML_CUDA=ON \
+    -DCMAKE_CUDA_ARCHITECTURES="86" \
+    \
+    -DGGML_BACKEND_DL=ON
+
+
+# 86 - support for nvidia rtx 3050 (6gb vram, ik, ik..)
+#    cmake -B build -DGGML_NATIVE=OFF -DGGML_CUDA=ON -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON -DLLAMA_BUILD_TESTS=OFF ${CMAKE_ARGS} -DCMAKE_EXE_LINKER_FLAGS=-Wl,--allow-shlib-undefined . && \
+    #wtf -DCUDAToolkit_SENTINEL_FILE="/usr/local/cuda/version.json" \
+
+echo "
+    \
+    -DLLAMA_BUILD_TESTS=OFF \
+    \
+    -DGGML_CPU_ALL_VARIANTS=ON \
+    -DGGML_AVX=ON \
+    -DGGML_AVX2=ON \
+    -DGGML_FMA=ON \
+    -DGGML_F16C=ON \
+    \
+    -DGGML_BACKEND_DL=ON
+    "
 
 cmake --build build --config Release -j$(nproc)
 
 mkdir install/usr/local/lib -p
 
-find . -name "libllama-server-impl.so*" -exec cp -fv "{}" install/usr/local/lib/.
-find . -name "libllama-common.so*" -exec cp -fv "{}" install/usr/local/lib/.
-find . -name "libmtmd.so.*" -exec cp -fv "{}" install/usr/local/lib/.
-find . -name "libllama.so.*" -exec cp -fv "{}" install/usr/local/lib/.
-find . -name "libggml.so.*" -exec cp -fv "{}" install/usr/local/lib/.
-find . -name "libggml-base.so.*" -exec cp -fv "{}" install/usr/local/lib/.
+find . -name "libllama-server-impl.so*" -exec cp -fv "{}" install/usr/local/lib/. \;
+find . -name "libllama-common.so*" -exec cp -fv "{}" install/usr/local/lib/. \;
+find . -name "libmtmd.so.*" -exec cp -fv "{}" install/usr/local/lib/. \;
+find . -name "libllama.so.*" -exec cp -fv "{}" install/usr/local/lib/. \;
+find . -name "libggml.so.*" -exec cp -fv "{}" install/usr/local/lib/. \;
+find . -name "libggml-base.so.*" -exec cp -fv "{}" install/usr/local/lib/. \;
 
 DESTDIR=`readlink -f install` cmake --build build --config Release --target install
 cd install

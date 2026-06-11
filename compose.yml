@@ -13,18 +13,19 @@ services:
     group_add:
       - video  # Required for GPU access
     # NVIDIA options
-    #devices:
-    #  - nvidia.com/gpu=all
-    # AMD-only options
     devices:
-      - /dev/kfd:/dev/kfd
-      - /dev/dri:/dev/dri
+      - nvidia.com/gpu=all
+    # AMD-only options
+    #devices:
+    #  - /dev/kfd:/dev/kfd
+    #  - /dev/dri:/dev/dri
     # END AMD
     ports:
       - "8080:8080"
     volumes:
       - ./cache:/cache:Z
       - ./scripts:/scripts:Z
+      - ./app:/app:Z
     environment:
       - LLAMA_ARG_HOST=0.0.0.0
       - HSA_OVERRIDE_GFX_VERSION=11.0.2

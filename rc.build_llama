@@ -2,6 +2,10 @@
 
 if [[ ! -d llama.cpp ]]; then
   git clone https://github.com/ggml-org/llama.cpp
+else
+  pushd llama.cpp
+  git clean -f -x -d
+  popd
 fi
 
 RUN_CMD=$1

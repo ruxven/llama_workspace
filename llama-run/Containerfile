@@ -1,8 +1,16 @@
 FROM fedora:latest
 
 RUN dnf update -y \
+    && \
+    dnf install -y 'dnf-command(config-manager)' \
+    && \
+    dnf config-manager addrepo --from-repofile https://developer.download.nvidia.com/compute/cuda/repos/fedora43/x86_64/cuda-fedora43.repo
+
+RUN dnf update -y \
     && dnf install -y libgomp curl vulkan-loader mesa-vulkan-drivers \
     libglvnd libGL libglvnd-glx libglvnd-egl mesa-libGLES \
+    \
+        cuda-toolkit \
     \
     tini \
     && dnf autoremove -y \
@@ -12,7 +20,13 @@ RUN dnf update -y \
 COPY llama.cpp.tgz /tmp
 RUN tar -xvzf /tmp/llama.cpp.tgz -C / && rm /tmp/llama.cpp.tgz
 
-RUN echo "/usr/local/lib64" > /etc/ld.so.conf.d/usr_local_lib64.conf && ldconfig
+RUN echo "/usr/local/lib64" > /etc/ld.so.conf.d/usr_local_lib64.conf \
+	&& \
+    echo "/usr/local/cuda/lib64" > /etc/ld.so.conf.d/usr_local_cuda.conf \
+	&& \
+	ldconfig
+
+RUN echo "export PATH=/usr/local/cuda/bin:$PATH" > /etc/profile.d/zzz_cuda.sh
 
 # Match these to your host user's UID/GID.
 ARG USERNAME=llama_herder
